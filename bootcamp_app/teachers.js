@@ -7,8 +7,8 @@ const config = {
   username: 'labber',
   password: 'labber',
 };
-
 const pool = new Pool(config);
+
 
 cohort = process.argv[2];
 
@@ -18,15 +18,15 @@ pool.query(`
   JOIN teachers ON teachers.id = teacher_id
   JOIN students ON students.id = student_id
   JOIN cohorts ON cohorts.id = students.cohort_id
-  WHERE cohorts.name = '${cohort}'
+  WHERE cohorts.name = $1
   GROUP BY teachers.name, cohorts.name
   ORDER BY teacher;
-`)
+`, [cohort])
   .then((results) => {
-    console.log(results.rows);
     results.rows.forEach(element => {
       console.log(`${element.cohort}: ${element.teacher}`);
     });
+    pool.end();
   })
   .catch((error) => {
     console.error('query error', error.stack);
